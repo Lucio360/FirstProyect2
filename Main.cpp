@@ -7,6 +7,8 @@
 #include "Engine/World.h"
 #include "Components/InputComponent.h"
 #include "GameFramework/PlayerInput.h"
+#include "Components/CapsuleComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
 AMain::AMain()
@@ -20,6 +22,9 @@ AMain::AMain()
 	CameraBoom->TargetArmLength = 600.f;// Camera Follows at this distance
 	CameraBoom->bUsePawnControlRotation = true; //Rotate arm based on controller
 
+	// Set Size for collision capsule
+	GetCapsuleComponent()->InitCapsuleSize(48.f, 105.f);
+
 	// Create Follow Camera
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
@@ -30,6 +35,18 @@ AMain::AMain()
 	//Set our turn rates for input
 	BaseTurnRate = 65.f;
 	BaseLookUpRate = 65.f;
+
+	// Character don`t rotate when the controller rotates.
+	// Let that just affect the camera
+	bUseControllerRotationYaw = false;
+	bUseControllerRotationPitch = false;
+	bUseControllerRotationRoll = false;
+
+	// Configure character movement
+	GetCharacterMovement()->bOrientRotationToMovement = true; // character moves in the direction of input...
+	GetCharacterMovement()->RotationRate = FRotator(0.f, 840.f, 0);//...at this rotation rate
+	GetCharacterMovement()->JumpZVelocity = 650.f;
+	GetCharacterMovement()->AirControl = 0.2f;
 
 }
 
@@ -51,12 +68,16 @@ static void InitializedDefaultPawnInputBindings()
 {
 	UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("PawnMoveForward", EKeys::W, 1.f));
 	UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("PawnMoveForward", EKeys::S, -1.f));
+	UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("PawnMoveForward", EKeys::Gamepad_LeftY, 1.f));
 
 	UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("PawnMoveRight", EKeys::D, 1.f));
 	UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("PawnMoveRight", EKeys::A, -1.f));
+	UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("PawnMoveRight", EKeys::Gamepad_LeftX, 1.f));
 
 	UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("Turn", EKeys::MouseX, 1.f));
 	UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("LookUp", EKeys::MouseY, -1.f));
+	UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("Turn", EKeys::Gamepad_RightX, 1.f));
+	UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("LookUp", EKeys::Gamepad_RightY, 1.f));
 
 	UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("TurnRate", EKeys::Right, 1.f));
 	UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("TurnRate", EKeys::Left, -1.f));
@@ -65,6 +86,7 @@ static void InitializedDefaultPawnInputBindings()
 	UPlayerInput::AddEngineDefinedAxisMapping(FInputAxisKeyMapping("LookUpRate", EKeys::Down, 1.f));
 
 	UPlayerInput::AddEngineDefinedActionMapping(FInputActionKeyMapping("Jump", EKeys::SpaceBar));
+	UPlayerInput::AddEngineDefinedActionMapping(FInputActionKeyMapping("Jump", EKeys::Gamepad_FaceButton_Bottom));
 
 }
 
