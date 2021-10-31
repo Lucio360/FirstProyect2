@@ -47,8 +47,16 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayerStats")
 	float Stamina;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "PlayerStats")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayerStats")
 	int32 Coins;
+
+	void DecrementHealth(float Amount);
+
+	void Die();
+
+	
+
+	void IncrementCoins(int32 Amount);
 
 
 protected:

@@ -2,10 +2,11 @@
 
 
 #include "PickUp.h"
+#include "Main.h"
 
 APickUp::APickUp()
 {
-
+	CoinCount = 1;
 }
 
 void APickUp::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -13,6 +14,15 @@ void APickUp::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* O
 	Super::OnOverlapBegin(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
 
 	UE_LOG(LogTemp, Warning, TEXT("PickUp::OnOverlapBegin()"));
+
+	if (OtherActor)
+	{
+		AMain* Main = Cast<AMain>(OtherActor);
+		if (Main)
+		{
+			Main->IncrementCoins(CoinCount);
+		}
+	}
 }
 
 
@@ -22,3 +32,5 @@ void APickUp::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* Oth
 
 	UE_LOG(LogTemp, Warning, TEXT("PickUp::OnOverlapEnd()"));
 }
+
+

@@ -54,6 +54,8 @@ AMain::AMain()
 	Stamina = 120.f;
 	Coins = 0;
 
+	
+
 
 }
 
@@ -155,5 +157,28 @@ void AMain::TurnAtRate(float Rate)
 void AMain::LookUpAtRate(float Rate)
 {
 	AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
+}
+
+void AMain::DecrementHealth(float Amount)
+{
+	if (Health - Amount <= 0)
+	{
+		Health -= Amount;
+		Die();
+	}
+	else
+	{
+		Health -= Amount;
+	}
+}
+
+void AMain::Die()
+{
+
+}
+
+void AMain::IncrementCoins(int32 Amount)
+{
+	Coins += Amount;
 }
 
