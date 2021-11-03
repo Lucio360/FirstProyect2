@@ -37,6 +37,8 @@ public:
 
 	TArray<FVector> PickUpLocations;
 
+	
+
 	UFUNCTION(BlueprintCallable)
 	void ShowPickUpLocations();
 
@@ -145,5 +147,10 @@ public:
 
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Items")
+	class AWeapon* EquipWeapon;
+
+	FORCEINLINE void SetEquippedWeapon(AWeapon* WeaponToSet) { EquipWeapon = WeaponToSet; }
 
 };
