@@ -205,7 +205,11 @@ static void InitializedDefaultPawnInputBindings()
 	UPlayerInput::AddEngineDefinedActionMapping(FInputActionKeyMapping("Jump", EKeys::Gamepad_FaceButton_Bottom));
 
 	UPlayerInput::AddEngineDefinedActionMapping(FInputActionKeyMapping("Sprint", EKeys::LeftShift));
+	UPlayerInput::AddEngineDefinedActionMapping(FInputActionKeyMapping("Sprint", EKeys::Gamepad_LeftShoulder));
 	UPlayerInput::AddEngineDefinedActionMapping(FInputActionKeyMapping("LMB", EKeys::LeftMouseButton));
+	UPlayerInput::AddEngineDefinedActionMapping(FInputActionKeyMapping("LMB", EKeys::Gamepad_FaceButton_Left));
+
+	
 
 }
 

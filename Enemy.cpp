@@ -5,6 +5,8 @@
 #include "Components/SphereComponent.h"
 #include "AIController.h"
 #include "Main.h"
+#include "AI/Navigation/NavigationTypes.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 // Sets default values
 AEnemy::AEnemy()
@@ -19,6 +21,8 @@ AEnemy::AEnemy()
 	CombatSphere = CreateDefaultSubobject<USphereComponent>(TEXT("CombatSphere"));
 	CombatSphere->SetupAttachment(GetRootComponent());
 	CombatSphere->InitSphereRadius(75.f);
+
+	bOverlappingCombatSphere = false;
 
 }
 
@@ -65,17 +69,54 @@ void AEnemy::AgroSphereOnOverlapBegin(UPrimitiveComponent* OverlappedComponent, 
 
 void AEnemy::AgroSphereOnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
+	if (OtherActor)
+	{
+		AMain* Main = Cast<AMain>(OtherActor);
 
+		if (Main)
+		{
+			SetEnemyMovementStatus(EEnemyMovementStatus::EMS_Idle);
+			if (AIController)
+			{
+				AIController->StopMovement();
+			}
+			
+		}
+	}
 }
 
 void AEnemy::CombatSphereOnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-
+	if (OtherActor)
+	{
+		AMain* Main = Cast<AMain>(OtherActor);
+		
+		if (Main)
+		{
+			CombatTarget = Main;
+			bOverlappingCombatSphere = true;
+			SetEnemyMovementStatus(EEnemyMovementStatus::EMS_Attacking);
+		}
+	}
 }
 
 void AEnemy::CombatSphereOnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
+	if (OtherActor)
+	{
+		AMain* Main = Cast<AMain>(OtherActor);
 
+		if (Main)
+		{
+			bOverlappingCombatSphere = false;
+			
+			if (EnemyMovementStatus != EEnemyMovementStatus::EMS_Attacking)
+			{
+				MoveToTarget(Main);
+				CombatTarget = nullptr;
+			}
+		}
+	}
 }
 
 void AEnemy::MoveToTarget(AMain* Target)
@@ -86,10 +127,21 @@ void AEnemy::MoveToTarget(AMain* Target)
 	{
 		FAIMoveRequest MoveRequest;
 		MoveRequest.SetGoalActor(Target);
-		MoveRequest.SetAcceptanceRadius(5.f);
+		MoveRequest.SetAcceptanceRadius(10.f);
 
 		FNavPathSharedPtr NavPath;
 
 		AIController->MoveTo(MoveRequest, &NavPath);
+
+		/*
+		TArray<FNavPathPoint> PathPoints = NavPath->GetPathPoints();
+
+		for (FNavPathPoint Point : PathPoints)
+		{
+			FVector Location = Point.Location;
+
+			UKismetSystemLibrary::DrawDebugSphere(this, Location, 25.f, 8, FLinearColor::Red, 10.f, 1.5f);
+		}
+		*/
 	}
 }
