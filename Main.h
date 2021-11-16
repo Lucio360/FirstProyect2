@@ -11,6 +11,7 @@ enum class EMovementStatus : uint8
 {
 	EMS_Normal UMETA(DisplayName = "Normal"),
 	EMS_Sprinting UMETA(DisplayName = "Sprinting"),
+	EMS_Dead UMETA(DisplayName = "Dead"),
 
 	EMS_Max UMETA(DisplayName = "DefaultMax")
 };
@@ -34,6 +35,17 @@ class FIRSTPROYECT2_API AMain : public ACharacter
 public:
 	// Sets default values for this character's properties
 	AMain();
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
+	bool bHasCombatTarget;
+
+	FORCEINLINE void SetHasCombatTarget(bool HasTarget) { bHasCombatTarget = HasTarget; }
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Combat")
+	FVector CombatTargetLocation;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Controller")
+	class AMainPlayerController* MainPlayerController;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
 	class UParticleSystem* HitParticles;
@@ -132,6 +144,8 @@ public:
 
 	void Die();
 
+	virtual void Jump() override;
+
 	
 
 	void IncrementCoins(int32 Amount);
@@ -153,6 +167,9 @@ public:
 
 	/** Called for side to side input */
 	void MoveRight(float Value);
+
+	bool bMovingForward;
+	bool bMovingRight;
 
 	/** Called via input to turn at a given rate
 	*@param Rate This is a normalized rate, i.e. 1.0 means 100% of desired turn rate
@@ -195,4 +212,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void PlaySwingSound();
 
+	UFUNCTION(BlueprintCallable)
+	void DeathEnd();
 };
