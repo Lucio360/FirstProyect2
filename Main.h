@@ -147,8 +147,11 @@ public:
 	virtual void Jump() override;
 
 	
-
+	UFUNCTION(BlueprintCallable)
 	void IncrementCoins(int32 Amount);
+
+	UFUNCTION(BlueprintCallable)
+	void IncrementHealth(float Amount);
 
 
 protected:

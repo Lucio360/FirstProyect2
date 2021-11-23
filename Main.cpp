@@ -402,6 +402,18 @@ void AMain::IncrementCoins(int32 Amount)
 	Coins += Amount;
 }
 
+void AMain::IncrementHealth(float Amount)
+{
+	if (Health + Amount >= MaxHealth)
+	{
+		Health = MaxHealth;
+	}
+	else
+	{
+		Health += Amount;
+	}
+}
+
 void AMain::SetMovementStatus(EMovementStatus Status)
 {
 	MovementStatus = Status;
