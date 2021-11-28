@@ -19,6 +19,7 @@
 #include "Enemy.h"
 #include "MainPlayercontroller.h"
 #include "FirstSaveGame.h"
+#include "ItemStorage.h"
 
 // Sets default values
 AMain::AMain()
@@ -70,6 +71,7 @@ AMain::AMain()
 	bShiftKeyDown = false;
 	bLMBDown = false;
 	
+	bESCDown = false;
 
 	//Initialize Enums
 	MovementStatus = EMovementStatus::EMS_Normal;
@@ -263,6 +265,8 @@ static void InitializedDefaultPawnInputBindings()
 	UPlayerInput::AddEngineDefinedActionMapping(FInputActionKeyMapping("LMB", EKeys::LeftMouseButton));
 	UPlayerInput::AddEngineDefinedActionMapping(FInputActionKeyMapping("LMB", EKeys::Gamepad_FaceButton_Left));
 
+	UPlayerInput::AddEngineDefinedActionMapping(FInputActionKeyMapping("ESC", EKeys::Escape));
+	UPlayerInput::AddEngineDefinedActionMapping(FInputActionKeyMapping("ESC", EKeys::Q));
 	
 
 }
@@ -283,6 +287,9 @@ void AMain::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 	PlayerInputComponent->BindAction("LMB", IE_Pressed, this, &AMain::LMBDown);
 	PlayerInputComponent->BindAction("LMB", IE_Released, this, &AMain::LMBUp);
+
+	PlayerInputComponent->BindAction("ESC", IE_Pressed, this, &AMain::ESCDown);
+	PlayerInputComponent->BindAction("ESC", IE_Released, this, &AMain::ESCUp);
 
 	PlayerInputComponent->BindAxis("PawnMoveForward", this, &AMain::MoveForward);
 	PlayerInputComponent->BindAxis("PawnMoveRight", this, &AMain::MoveRight);
@@ -365,6 +372,21 @@ void AMain::LMBDown()
 void AMain::LMBUp()
 {
 	bLMBDown = false;
+}
+
+void AMain::ESCDown()
+{
+	bESCDown = true;
+
+	if (MainPlayerController)
+	{
+		MainPlayerController->TogglePauseMenu();
+	}
+}
+
+void AMain::ESCUp()
+{
+	bESCDown = false;
 }
 
 void AMain::DecrementHealth(float Amount)
@@ -614,6 +636,11 @@ void AMain::SaveGame()
 	SaveGameInstance->CharacterStats.Stamina = Stamina;
 	SaveGameInstance->CharacterStats.MaxStamina = MaxStamina;
 
+	if (EquippedWeapon)
+	{
+		SaveGameInstance->CharacterStats.WeaponName = EquippedWeapon->Name;
+	}
+
 	SaveGameInstance->CharacterStats.Location = GetActorLocation();
 	SaveGameInstance->CharacterStats.Rotation = GetActorRotation();
 
@@ -632,6 +659,23 @@ void AMain::LoadGame(bool SetPosition)
 	Coins = LoadGameInstance->CharacterStats.Coins;
 	Stamina = LoadGameInstance->CharacterStats.Stamina;
 	MaxStamina = LoadGameInstance->CharacterStats.MaxStamina;
+
+	if (WeaponStorage)
+	{
+		AItemStorage* Weapons = GetWorld()->SpawnActor<AItemStorage>(WeaponStorage);
+		if (Weapons)
+		{
+			FString WeaponName = LoadGameInstance->CharacterStats.WeaponName;
+			if (Weapons->WeaponMap.Contains(WeaponName))
+			{
+				AWeapon* WeaponToEquip = GetWorld()->SpawnActor<AWeapon>(Weapons->WeaponMap[WeaponName]);
+				WeaponToEquip->Equip(this);
+			}
+			
+			
+		}
+	}
+	
 
 	if (SetPosition)
 	{

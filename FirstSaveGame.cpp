@@ -9,5 +9,5 @@ UFirstSaveGame::UFirstSaveGame()
 
 	UserIndex = 0;
 
-	
+	CharacterStats.WeaponName = TEXT("");
 }
